@@ -9,9 +9,6 @@ class Player:
         #Contador para las fotogramas
         self.cont = 0
 
-        #Posicion en el mundo
-        self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT //2
-
         #velocidad vertical
         self.Vy = 0
 
@@ -24,7 +21,19 @@ class Player:
         #estado
         self.current_state = CHARACTER_STATE_IDLE
 
+        #Sprite inicial
         self.image = self.idle_images[0]
+
+        # Collider
+        self.rect = self.image.get_rect()
+
+        # Posicion en el mundo
+        self.rect.x, self.rect.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+
+        # Escalar el collider
+        centroOriginal = self.rect.center
+        self.rect = self.rect.inflate(-10,-10)
+        self.rect.center = centroOriginal
 
     def load_idle(self):
         images = []
@@ -61,22 +70,22 @@ class Player:
         return images
 
     def move(self,dx, dy, screen):
-        self.x = max(0, min(self.x+dx,SCREEN_WIDTH))
-        self.y = max(0, min(self.y+dy,SCREEN_HEIGHT))
+        self.rect.x = max(0, min(self.rect.x+dx,SCREEN_WIDTH))
+        self.rect.y = max(0, min(self.rect.y+dy,SCREEN_HEIGHT))
 
     def jump(self):
         if self.Vy == 0:
             self.Vy = -500
 
     def aplicar_gravedad(self, dt):
-        gravedad = 1000
+        gravedad = GRAVEDAD
         self.Vy += gravedad*dt
-        new_y = self.y
+        new_y = self.rect.y
         new_y += self.Vy * dt
         new_y = min(new_y, SCREEN_HEIGHT - 64)
-        if new_y == self.y:
+        if new_y == self.rect.y:
             self.Vy = 0
-        self.y = new_y
+        self.rect.y = new_y
 
     def getVy(self):
         return self.Vy
@@ -115,4 +124,4 @@ class Player:
         self.current_state = state
 
     def draw(self, screen):
-        screen.blit(self.image, (self.x, self.y))
+        screen.blit(self.image, self.rect)
